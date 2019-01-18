@@ -12,3 +12,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+.container {
+  margin: 0;
+  position: relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  width: 1000px;
+  padding-bottom: 56.25%;
+}
+.container img {
+  top: 0;
+  left: 0;
+  position: relative;
+  width: 1000px;
+  height:667px;
+}
+.tilewrap{
+  box-sizing: border-box;
+  border: solid white 1px;
+  display:inline-block;
+  width:200px;
+  height:134px;
+  overflow: hidden;
+  position:relative;
+}
+.selected{
+  border: solid red 5px;
+}
