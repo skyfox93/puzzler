@@ -44,6 +44,13 @@ class App extends Component {
         newTilesArray.push(newTile)
         }
         //randomize Array
+        let length=newTilesArray.length
+        for(let i=0;i<length;i++){
+          let random=Math.floor(Math.random()*(length-1))
+          let randomitemArray=newTilesArray.splice(random,1)
+          newTilesArray.push(randomitemArray[0])
+
+        }
       this.setState({tilesArray:newTilesArray})
     }
 
