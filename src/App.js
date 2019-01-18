@@ -4,11 +4,20 @@ import './App.css';
 import Tile from './Tile'
 class App extends Component {
 
+
+
   state = {
-    picturePath:'./parkpic_small.jpeg',
+
+   //App State
+    puzzlesArray : {},
+
+    //puzzleState
+    picturePath:'./fireisland.jpeg',
     tilesArray: [],
     tileSelected: false,
     selectedTileId : null
+    //puzzleStatus: 'incomplete'
+    //timeSoFarMS:0
   }
 
   handleSwap=(id) =>{
