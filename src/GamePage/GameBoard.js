@@ -2,6 +2,7 @@ import React from 'react'
 import Tile from './Tile'
 
 const  GameBoard = (props) => {
+  console.log('inside gameboard')
   return props.tilesArray.map((tile,i)=><div key={i}
   className={props.selectedTileId===tile.id ? "tilewrap selected" : "tilewrap"}>
   <Tile

@@ -8,21 +8,31 @@ class App extends Component {
     currentPuzzleID: 1,
     puzzlesArray : [{
       id:1,
-      picturePath:'./melody.jpg',
+      picturePath:'./1.jpg',
       tilesArray: [],
       complete:true
     },{
       id:2,
-      picturePath:'./parkpic_small.jpeg',
+      picturePath:'./2.jpg',
       tilesArray: [],
       complete:false
     },
     {
-      id:1,
-      picturePath:'./fireisland.jpeg',
+      id:3,
+      picturePath:'./3.jpg',
       tilesArray: [],
       complete:false
-    }],
+    },{
+      id:4,
+      picturePath:'./4.jpg',
+      tilesArray: [],
+      complete:false
+    },{id:5,
+    picturePath:'./5.jpg',
+    tilesArray: [],
+    complete:false
+  } ],
+
 
     // currentPuzzle
     currentPuzzle: {
@@ -42,7 +52,32 @@ class App extends Component {
     let id=this.state.currentPuzzleID
   return this.state.puzzlesArray.find(puzzle=>puzzle.id===id)
   }
-    saveGame= (time) => {
+  getCurrentStat=()=> {
+    return this.state.stats.find(stat=> stat.puzzle_id===this.state.currentPuzzleID && stat.inprogress===true)
+  }
+  saveGame= (time) => {
+    let stats=this.state.stats.map((stat) => {
+       if(stat.puzzle_id===this.state.currentPuzzleID && stat.inprogress===true){
+         let newStat={...stat, time:time}
+         //adapter.patchStat(stat.id,stat)
+        return newStat
+        }
+      else{return stat}
+    })
+      this.setState({stats:stats})
+    }
+
+      completeGame=(time)=>{
+        let stat={...this.getCurrentStat()}
+        stat.inprogress=false;
+        stat.time=time
+        //adapter.patchStat(stat.id,stat)
+        //adapter.completeGame(this.state.currentPuzzleID)
+        let statIndex=this.state.stats.indexOf(stat)
+        let statsCopy={...this.state.stats}
+        statsCopy[statIndex]= stat
+        let puzzles=this.state.puzzesArray.map(puzzle=> puzzle.id===this.state.currentPuzzleID ? {...puzzle, complete:true}: puzzle)
+        this.setState({homepage:true, stats:statsCopy,puzzlesArray:puzzles })
       }
 
      // make patch request to the backend
@@ -52,9 +87,11 @@ class App extends Component {
     }
     switchGame=(id)=>
     {let currentPuzzle=this.state.puzzlesArray.find((puzzle)=> puzzle.id===id)
-      if(!currentPuzzle.tilesArray.lenth>0){this.generateTiles()}
       let currentPuzzleID=currentPuzzle.id
-      this.setState({homepage:false, currentPuzzleID:currentPuzzleID})
+      if(currentPuzzle.tilesArray.length<1){
+        this.setState({homepage:false, currentPuzzleID:currentPuzzleID},this.generateTiles)
+}     else{this.setState({homepage:false, currentPuzzleID:currentPuzzleID},this.generateTiles)
+}
     }
   // functions for currentPuzzle
   handleSwap=(id) =>{
@@ -116,12 +153,12 @@ class App extends Component {
       newTilesArray.push(newTile)
       }
     //randomize Array
-    let length=newTilesArray.length
-    for(let i=0;i<length;i++){
-      let random=Math.floor(Math.random()*(length-1))
-      let randomitemArray=newTilesArray.splice(random,1)
-      newTilesArray.push(randomitemArray[0])
-    }
+    // let length=newTilesArray.length
+    // for(let i=0;i<length;i++){
+    //   let random=Math.floor(Math.random()*(length-1))
+    //   let randomitemArray=newTilesArray.splice(random,1)
+    //   newTilesArray.push(randomitemArray[0])
+    // }
     let newPuzzleArray=[...this.state.puzzlesArray]
     let currentPuzzle=this.getCurrentPuzzle()
     let currentIndex=newPuzzleArray.indexOf(currentPuzzle)
@@ -130,23 +167,24 @@ class App extends Component {
     this.setState({puzzlesArray:newPuzzleArray})
   }
     shuffleTiles= ()=> {
-      let newTilesArray=[...this.state.currentPuzzle.tilesArray]
+      let newTilesArray=[...this.getCurrentPuzzle().tilesArray]
       let length=newTilesArray.length
       for(let i=0;i<length;i++){
         let random=Math.floor(Math.random()*(length-1))
         let randomitemArray=newTilesArray.splice(random,1)
         newTilesArray.push(randomitemArray[0])
       }
-      let currentPuzzle={...this.state.currentPuzzle, tilesArray: newTilesArray}
 
-      this.setState({currentPuzzle: currentPuzzle})
+      let puzzlesArray=this.state.puzzlesArray.map(puzzle => puzzle.id===this.state.currentPuzzleID ?
+      {...this.getCurrentPuzzle(), tilesArray: newTilesArray} : puzzle)
+      this.setState({puzzlesArray})
     }
 
 
 
 
   render() {
-    return (this.state.homepage ? <HomePage puzzles={this.state.puzzlesArray} switchPuzzle={this.switchPuzzle} />
+    return (this.state.homepage ? <HomePage puzzles={this.state.puzzlesArray} switchGame={this.switchGame} />
       :<GamePage
       currentPuzzle={this.getCurrentPuzzle()}
       gameState={this.state.gameState}

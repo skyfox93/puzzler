@@ -21,9 +21,13 @@ export default class GamePage extends Component {
      this.setState({ timeElapsed: elapsed})
    }
    restartGame=()=> {
-    //  this.props.saveGame(this.state.timeElapsed)
+    //this.props.saveGame(this.state.timeElapsed)
       this.props.shuffleTiles()
       this.setState({startMS: Date.now()})
+   }
+   exitGame=()=>{
+     this.props.saveGame(this.state.timeElapsed)
+     this.props.showHomePage()
    }
 
 
@@ -38,7 +42,7 @@ export default class GamePage extends Component {
           </div>
           <img class="small" src={require(`${this.props.currentPuzzle.picturePath}`)}/>
           <Controls saveGame={this.props.saveGave} timeElapsed={this.state.timeElapsed}/>
-          {this.props.winMessage ? <WinMessage restartGame={this.restartGame}/>: null}
+          {this.props.winMessage ? <WinMessage restartGame={this.restartGame} exitGame={this.exitGame}/>: null}
       </div>
     );
   }
