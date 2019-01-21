@@ -13,29 +13,30 @@ code {
     monospace;
 }
 .container {
+  display:inline-block;
   margin: 0;
   position: relative;
   perspective: 1000px;
   transform-style: preserve-3d;
-  width: 1000px;
-  padding-bottom: 56.25%;
-}
+  width: 900px;
+  }
 .container img {
   top: 0;
   left: 0;
   position: relative;
-  width: 1000px;
-  height:667px;
+  width: 900px;
+  height:600px;
 }
 .tilewrap{
   box-sizing: border-box;
   border: solid white 1px;
   display:inline-block;
-  width:200px;
-  height:134px;
+  width:180px;
+  height:120px;
   overflow: hidden;
   position:relative;
 }
 .selected{
   border: solid red 5px;
 }
+.small{width:200px;float:left;border:solid 5px black;}
