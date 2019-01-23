@@ -40,6 +40,9 @@ export default class GamePage extends Component {
 
 
   render() {
+    console.log("Path is", this.props.currentPuzzle.image.image_url)
+    //debugger
+    //console.log("Interpolated path is", modulePath)
     return (
       <div>
         <div className='container'>
@@ -48,7 +51,7 @@ export default class GamePage extends Component {
           selectedTileId={this.props.selectedTileId}
           />}
           </div>
-          <img class="small" src={require(`${this.props.currentPuzzle.image.image_url}`)}/>
+          <img class="small" src={require(`../${ this.props.currentPuzzle.image.image_url}`)}/>
           <Controls exitGame={this.exitGame} timeElapsed={this.state.timeElapsed}/>
           {this.props.winMessage ? <WinMessage restartGame={this.restartGame} exitGame={this.exitGame}/>: null}
       </div>

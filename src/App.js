@@ -8,7 +8,7 @@ const adapter = Adapter('http://localhost:3000/api/v1')
 class App extends Component {
   state = {
     // Application state
-    homepage: true,
+    homepage: false,
     currentPuzzleID: 1,
     puzzlesArray: [],
     userID:1,
@@ -16,7 +16,7 @@ class App extends Component {
 
     // currentPuzzle
     currentPuzzle: {
-      picturePath: './fireisland.jpeg',
+      image:{image_url:'fireisland.jpeg'},
       tiles: [],
       complete: false
     },
@@ -202,19 +202,19 @@ class App extends Component {
     this.setState({puzzlesArray})}
 
   componentDidMount() {
-    adapter.getUser(1).then((user) => {
-      this.setState({
-        stats: user.scores,
-        user: {id: user.id,name: user.username}
-      })
-    })
-    adapter.getPuzzles(1).then(puzzles => {
-      let newPuzzles = puzzles.map(puzzle => {
-        return puzzle.tiles ? {...puzzle,tiles: this.restoreTiles(puzzle)}
-        : {...puzzle, tiles: []}
-      })
-      this.setState({puzzlesArray: newPuzzles})
-    })
+  //   adapter.getUser(1).then((user) => {
+  //     this.setState({
+  //       stats: user.scores,
+  //       user: {id: user.id,name: user.username}
+  //     })
+  //   })
+  //   adapter.getPuzzles(1).then(puzzles => {
+  //     let newPuzzles = puzzles.map(puzzle => {
+  //       return puzzle.tiles ? {...puzzle,tiles: this.restoreTiles(puzzle)}
+  //       : {...puzzle, tiles: []}
+  //     })
+  //     this.setState({puzzlesArray: newPuzzles})
+  //   })
   }
   render() {
     return (this.state.homepage ? < HomePage
@@ -222,7 +222,7 @@ class App extends Component {
       switchGame = {this.switchGame}
       /> :
       <GamePage
-      currentPuzzle = {this.getCurrentPuzzle()}
+      currentPuzzle = {this.state.currentPuzzle}
       gameState = {this.state.gameState}
       handleSwap = {this.handleSwap}
       selectedTileId = {this.state.selectedTileId}
@@ -232,7 +232,7 @@ class App extends Component {
       saveStat = {this.saveStat}
       completeStat={this.completeStat}
       toHomePage ={this.toHomePage}
-      timeSoFarMs={this.getCurrentStat().time}
+      timeSoFarMs={0}
       />
     );
   }
