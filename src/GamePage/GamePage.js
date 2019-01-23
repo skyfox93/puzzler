@@ -8,7 +8,6 @@ export default class GamePage extends Component {
 
 
    state= {
-     startMS: Date.now(),
      timeElapsed: 0
      }
 
@@ -17,17 +16,26 @@ export default class GamePage extends Component {
      this.timerID= setInterval(this.tick, 1000)
    }
    tick = ()=> {
-     let elapsed=Date.now()-this.state.startMS
+     let elapsed=this.state.timeElapsed+1000
      this.setState({ timeElapsed: elapsed})
    }
    restartGame=()=> {
-    //this.props.saveGame(this.state.timeElapsed)
+    this.props.completeStat(this.state.timeElapsed)
       this.props.shuffleTiles()
       this.setState({startMS: Date.now()})
    }
    exitGame=()=>{
-     this.props.saveGame(this.state.timeElapsed)
-     this.props.showHomePage()
+     console.log('inside exitGame')
+     this.props.saveStat(this.state.timeElapsed);
+     this.props.toHomePage();
+   }
+   componentDidUpdate(prevProps,prevState){
+     if((!prevProps.winMessage)&&this.props.winMessage){
+      this.props.completeStat(prevState.timeElapsed)
+     }
+   }
+   componentWillUnmount(){
+     clearInterval(this.timerID)
    }
 
 
@@ -40,8 +48,8 @@ export default class GamePage extends Component {
           selectedTileId={this.props.selectedTileId}
           />}
           </div>
-          <img class="small" src={require(`${this.props.currentPuzzle.picturePath}`)}/>
-          <Controls saveGame={this.props.saveGave} timeElapsed={this.state.timeElapsed}/>
+          <img class="small" src={require(`${this.props.currentPuzzle.image.image_url}`)}/>
+          <Controls exitGame={this.exitGame} timeElapsed={this.state.timeElapsed}/>
           {this.props.winMessage ? <WinMessage restartGame={this.restartGame} exitGame={this.exitGame}/>: null}
       </div>
     );

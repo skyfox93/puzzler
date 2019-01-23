@@ -5,10 +5,12 @@ export default class Controls extends React.Component{
 
 
  render(){
+   let timestring=
+   Math.floor(this.props.timeElapsed/60000)+':'+Math.round(this.props.timeElapsed/1000)%60
    return (
      <div className='controls'>
-      <button onClick={()=> this.saveGame(this.props.timeElapsed)}>Save and Exit </button>
-      <div>{parseInt(this.props.timeElapsed/1000)}</div>
+      <button onClick={this.props.exitGame}>Save and Exit </button>
+      <div>{timestring}</div>
     </div>
     )
  }

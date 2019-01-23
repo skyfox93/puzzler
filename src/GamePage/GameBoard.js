@@ -3,13 +3,13 @@ import Tile from './Tile'
 
 const  GameBoard = (props) => {
   console.log('inside gameboard')
-  return props.tilesArray.map((tile,i)=><div key={i}
+  return props.tiles.map((tile,i)=><div key={i}
   className={props.selectedTileId===tile.id ? "tilewrap selected" : "tilewrap"}>
   <Tile
     id={tile.id}
     top={tile.top}
     left={tile.left}
-    picturePath={props.picturePath}
+    image_url={props.image.image_url}
     handleSwap={props.handleSwap}
     saveGame={props.saveGame}
     />
