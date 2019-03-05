@@ -22,16 +22,22 @@ export default class GamePage extends Component {
    restartGame=()=> {
     this.props.completeStat(this.state.timeElapsed)
       this.props.shuffleTiles()
-      this.setState({startMS: Date.now()})
+      this.setState({timeElapsed:0})
+      this.props.clearWin()
+      this.timerID= setInterval(this.tick, 1000)
+
    }
    exitGame=()=>{
      console.log('inside exitGame')
      this.props.saveStat(this.state.timeElapsed);
+     this.props.savePuzzle()
      this.props.toHomePage();
    }
    componentDidUpdate(prevProps,prevState){
      if((!prevProps.winMessage)&&this.props.winMessage){
       this.props.completeStat(prevState.timeElapsed)
+      clearInterval(this.timerID)
+
      }
    }
    componentWillUnmount(){
@@ -44,17 +50,20 @@ export default class GamePage extends Component {
     //debugger
     //console.log("Interpolated path is", modulePath)
     return (
-      <div>
+      <>
         <div className='container'>
+        <div> Tip: Remember to save your puzzles! </div>
           {this.props.paused? <PauseScreen/>  : <GameBoard {...this.props.currentPuzzle}
           handleSwap={this.props.handleSwap}
           selectedTileId={this.props.selectedTileId}
           />}
           </div>
-          <img class="small" src={require(`../${ this.props.currentPuzzle.image.image_url}`)}/>
+          <div class="info">
+          <img class="small" src={require(`${ this.props.currentPuzzle.image.image_url}`)}/>
           <Controls exitGame={this.exitGame} timeElapsed={this.state.timeElapsed}/>
           {this.props.winMessage ? <WinMessage restartGame={this.restartGame} exitGame={this.exitGame}/>: null}
-      </div>
+          </div>
+      </>
     );
   }
 }

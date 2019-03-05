@@ -1,6 +1,17 @@
-import React, {
-  Component
-} from 'react';
+import React, { Fragment, Component } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+  withRouter
+} from 'react-router-dom'
+import Profile from './components/Profile'
+import LoginForm from './components/LoginForm'
+import RegistrationForm from './components/RegistrationForm'
+import ChangeUsername from './components/ChangeUsername'
+
+import Nav from './components/Nav'
 import GamePage from './GamePage/GamePage'
 import HomePage from './GamePage/HomePage.js'
 import Adapter from './Adapter'
@@ -8,10 +19,11 @@ const adapter = Adapter('http://localhost:3000/api/v1')
 class App extends Component {
   state = {
     // Application state
-    homepage: false,
+    homepage: true,
     currentPuzzleID: 1,
     puzzlesArray: [],
     userID:1,
+    currentUser:null,
 
 
     // currentPuzzle
@@ -28,6 +40,21 @@ class App extends Component {
     winMessage: false,
   }
 
+
+
+updateCurrentUser = user => {
+   this.setState({ currentUser: user })
+ }
+
+ logout = () => {
+   //localStorage.removeItem('token')
+   this.setState({ currentUser: null })
+ }
+
+
+  clearWin= ()=> {
+    this.setState({winMessage:false})
+  }
   getCurrentPuzzle = () => {
     let id = this.state.currentPuzzleID
     return this.state.puzzlesArray.find(puzzle => puzzle.id === id)
@@ -65,10 +92,10 @@ class App extends Component {
       data=> this.setState({stats:[...stats,data]})
     )
   }
-
-
-
-
+  savePuzzle = ()=>{
+    let puzzle=this.getCurrentPuzzle()
+    adapter.patchGame(puzzle)
+  }
   toHomePage = () => {
     this.setState({  homepage: true});
   }
@@ -125,8 +152,7 @@ class App extends Component {
     // check if the puzzle is complete
     if (newTiles.every((tile, i) => i === tile.id)) {
       updatedPuzzle.complete = true;
-      let tileString = updatedPuzzle.tiles.map(tile => tile.id).join(',')
-      adapter.completeGame(this.state.currentPuzzleID, tileString).then(console.log)
+      adapter.completeGame(updatedPuzzle).then(console.log)
       this.setState({
         puzzlesArray: newPuzzleArray,
         tileSelected: false,
@@ -171,18 +197,20 @@ class App extends Component {
   }
 
   restoreTiles(puzzle){
-    let oldtiles=puzzle.tiles.split(',')
-    let newTilesArray = []
-    // where 5 is the width, height, 20 is 100/5
-    for (let i = 0; i < 25; i++) {
-      let id=oldtiles[i]
-      let newTile = {
+    let oldTiles=puzzle.tiles.split(',')
+    //eg. '1,5,4,3,2'
+    console.log('oldTiles', oldTiles)
+    let newTilesArray = oldTiles.map((tile,i)=>{
+      let id=oldTiles[i]
+      return {
         id: parseInt(id),
         top: -(Math.floor(id / 5)) * 120,
         left: id< 5 ? -id * 180 : -(id % 5) * 180
       }
-      newTilesArray.push(newTile)
-    }
+    })
+    // where 5 is the width, height, 20 is 100/5
+    console.log('newTiles', newTilesArray)
+
     return newTilesArray
   }
 
@@ -201,40 +229,76 @@ class App extends Component {
       })
     this.setState({puzzlesArray})}
 
-  componentDidMount() {
-  //   adapter.getUser(1).then((user) => {
-  //     this.setState({
-  //       stats: user.scores,
-  //       user: {id: user.id,name: user.username}
-  //     })
-  //   })
-  //   adapter.getPuzzles(1).then(puzzles => {
-  //     let newPuzzles = puzzles.map(puzzle => {
-  //       return puzzle.tiles ? {...puzzle,tiles: this.restoreTiles(puzzle)}
-  //       : {...puzzle, tiles: []}
-  //     })
-  //     this.setState({puzzlesArray: newPuzzles})
-  //   })
+  fetchMyStuff=(userId)=> {
+    console.log('Fetching Your Stuff')
+    console.log(userId)
+    adapter.getUser(userId).then((user) => {
+      console.log(user)
+      this.setState({
+        stats: user.scores,
+        user: {id: user.id,name: user.username}
+      })
+    })
+    adapter.getPuzzles(userId).then(puzzles => {
+      console.log(puzzles)
+      let newPuzzles = puzzles.map(puzzle => {
+        return puzzle.tiles ? {...puzzle,tiles: this.restoreTiles(puzzle)}
+        : {...puzzle, tiles: []}
+      })
+      this.setState({puzzlesArray: newPuzzles})
+    })
   }
   render() {
-    return (this.state.homepage ? < HomePage
-      puzzles = {this.state.puzzlesArray}
-      switchGame = {this.switchGame}
-      /> :
-      <GamePage
-      currentPuzzle = {this.state.currentPuzzle}
-      gameState = {this.state.gameState}
-      handleSwap = {this.handleSwap}
-      selectedTileId = {this.state.selectedTileId}
-      paused = {this.state.paused}
-      winMessage = {this.state.winMessage}
-      shuffleTiles = {this.shuffleTiles}
-      saveStat = {this.saveStat}
-      completeStat={this.completeStat}
-      toHomePage ={this.toHomePage}
-      timeSoFarMs={0}
-      />
-    );
+    return <Router>
+    <div>
+      <Nav logged_in={!!this.state.currentUser} logout={this.logout} user={this.state.currentUser} />
+      <div className="spacer"></div>
+
+        <Route exact path="/" render={() => !!this.state.currentUser ? <Redirect to="/home" /> : <Redirect to="/login"/>} />
+        <Route exact path="/profile"render={() => <Profile
+           currentUser={this.state.currentUser} />}
+         />
+         <Route exact path="/edit_user" render={() => this.state.currentUser ? <ChangeUsername
+            user={this.state.currentUser} updateCurrentUser={this.updateCurrentUser}
+            beef='beef'
+            fetchMyStuff={this.fetchMyStuff} />
+          : <Redirect to='/login'/>}
+          />
+         <Route path="/signup" render={(props) => this.state.currentUser ? <Redirect to="/home"/>
+         : <RegistrationForm updateCurrentUser={this.updateCurrentUser} beef='beef' fetchMyStuff={this.fetchMyStuff}/>}
+         />
+        <Route exact path="/login"
+          render={() =>
+            this.state.currentUser ? <Redirect to="/home" /> :
+            <LoginForm updateCurrentUser={this.updateCurrentUser}
+              fetchMyStuff={this.fetchMyStuff}/>
+          }
+        />
+
+        <Route path="/home" render={()=>this.state.currentUser ? (this.state.homepage ? < HomePage
+           puzzles = {this.state.puzzlesArray}
+           switchGame = {this.switchGame}
+           /> :
+         <GamePage
+           currentPuzzle = {this.getCurrentPuzzle()}
+           gameState = {this.state.gameState}
+           handleSwap = {this.handleSwap}
+           selectedTileId = {this.state.selectedTileId}
+           paused = {this.state.paused}
+           winMessage = {this.state.winMessage}
+           shuffleTiles = {this.shuffleTiles}
+           saveStat = {this.saveStat}
+           completeStat={this.completeStat}
+           toHomePage ={this.toHomePage}
+           timeSoFarMs={this.getCurrentStat().time}
+           savePuzzle={this.savePuzzle}
+           clearWin={this.clearWin}
+         />) : <Redirect to='/login'/>}
+         />
+       </div>
+     </Router>
+
+
   }
 }
 

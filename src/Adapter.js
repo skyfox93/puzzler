@@ -3,14 +3,27 @@ function Adapter(baseUrl){
     return fetch(`${baseUrl}/users/${userID}/puzzles`).then(resp=>resp.json())
   }
 
-  const completeGame =function(puzzleId,tiles){
-    return fetch(`${baseUrl}/puzzles/${puzzleId}`,{
+  const completeGame =function(puzzle){
+    let tiles = puzzle.tiles.map(tile => tile.id).join(',')
+    return fetch(`${baseUrl}/puzzles/${puzzle.id}`,{
       method: "PATCH",
       headers: {
         'Content-Type':'application/json',
         'accepts': 'application/json'
       },
-      body: JSON.stringify({puzzle: {tiles:tiles, complete:true}})
+      body: JSON.stringify({puzzle: {tiles:null, complete:true}})
+    })
+    .then(resp=>resp.json())
+  }
+  const patchGame =function(puzzle){
+  let tiles = puzzle.tiles.map(tile => tile.id).join(',')
+    return fetch(`${baseUrl}/puzzles/${puzzle.id}`,{
+      method: "PATCH",
+      headers: {
+        'Content-Type':'application/json',
+        'accepts': 'application/json'
+      },
+      body: JSON.stringify({puzzle: {tiles:tiles}})
     })
     .then(resp=>resp.json())
   }
@@ -47,6 +60,7 @@ function Adapter(baseUrl){
     getPuzzles: getPuzzles,
     getUser: getUser,
     completeGame: completeGame,
+    patchGame:patchGame,
     postStat: postStat,
     patchStat: patchStat
   }

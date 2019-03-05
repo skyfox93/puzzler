@@ -19,7 +19,7 @@ code {
   perspective: 1000px;
   transform-style: preserve-3d;
   width: 900px;
-  margin-left:100px
+  margin-left:50px
   }
 .container img {
   top: 0;
@@ -29,6 +29,7 @@ code {
   height:600px;
   margin:0;
   padding:0;
+  transition: margin 1s;
 }
 .tilewrap{
   box-sizing: border-box;
@@ -42,6 +43,10 @@ code {
 .selected{
   border: solid red 5px;
 }
+.win_message{position:absolute;top:300px;left:300px;background-color:white;}
 .small{width:300px;float:right;border:solid 5px black;margin:25px;}
-.thumb-container{width:700px;margin: 10px auto; }
+.thumb-container{width:700px;margin: 5px auto;overflow:auto;}
 .puzzle-thumb{width:300px;height:200px; box-shadow: 10px;margin:20px;}
+.info {display:inline-block;float:right;margin:0;}
+.controls{margin:10px auto;}
+.spacer{height:50px;}
