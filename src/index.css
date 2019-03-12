@@ -38,6 +38,7 @@ code {
   width:180px;
   height:120px;
   overflow: hidden;
+  margin-bottom:-4px;
   position:relative;
 }
 .selected{
